@@ -1,5 +1,75 @@
 # Taller Big Data con Apache Spark + R desde Databricks cloud
 
+### R + Spark + Big Data
+
+![alt text](https://camo.githubusercontent.com/c5bfd73908238855af39f3c8536dfcc6169db4c6/68747470733a2f2f73697465732e676f6f676c652e636f6d2f736974652f6d616e7570617272612f686f6d652f537061726b526c6f676f2e706e67)
+
+#### Introducción
+
+La tendencia más reciente en el análisis de grandes conjuntos de datos indica la necesidad de un análisis INTERACTIVO de grandes conjuntos de datos.
+
+Debido a ello se han desarrollado herramientas academicas y comerciales para trabajar de este modo con los datos.
+
+Está claro que cada vez más el uso de herramientas como R para el análisis de datos, ya que permiten una mejora sustancial y más avanzada para el estudio de los datos. R, como sabemos, es ya hoy en día bastante popular y provee de soporte para procesamiento de datos estructurados usando dataframes y lo mejor de todo es que incluye en CRAN un número muy elevado de paquetes para análisis estadístico y visualización.
+
+- R es la herramienta de facto para el análisis de datos
+- R soporta procesamiento de datos estrcuturados dataframes
+- R tiene miles de paquetes para todo tipo de tareas: analíticas, visualización, minería de datos, ...
+
+#### R
+
+El proyecto R, o el lenguaje R es un lenguaje de programación, un entorno de desarrollo interactivo, y un conjunto de bibliotecas de computación estadistica.
+
+R es un lenguaje interpretado y provee de soporte para ejecución condicional, bucles, etc. R también incluye caracteristicas para computación nmérica, con tipos de datos vectores, matrices, etc. Otra característica fundamental es el uso de dataframes: estructuras de datos en tablas donde cada columna está formada por elementos con su tipo de dato. Estos dataframes pueden ser manipulados para filtrado, agregación, etc.
+
+#### Entonces, ¿cuál es el problema? ¿Por qué no se usa para Datos Masivos?
+
+El análisis de datos usando R está limitado por la cantidad de memoria disponible en una sola máquina y además R trabaja en un sólo hilo/proceso (parallel), por lo que es poco práctico usar R para grandes conjuntos de datos.
+
+#### Spark
+
+Algunas de estas limitaciones se han abordado, a través de un mejor soporte de Entrada/Salida, la integración con Hadoop y el diseño de aplicaciones R distribuidas que se pueden integrar con los motores de Bases de Datos más extendidos
+
+Por tanto, analizamos cómo podemos escalar los programas R al tiempo que facilitamos su uso y despliegue a través de varias cargas de trabajo.
+
+Hay una serie de beneficios para el diseño de un frontend R que está integrado con Spark:
+
+- Bibliotecas de soporte: Spark, contiene bilbiotecas para trabajar con fuentes de datos y SQL, Machine Learning Distrbuido, análisis de grafos, etc.
+- Fuentes de datos: Desde bases de datos, HDFS, HBase, Cassandra, JSON, CSV, Parquet, ...
+- Rendimiento: Planificación de tareas, generación de código, gestión de memoria, ...
+
+Apache Spark es un motor de proposito general para procesamiento de conjuntos de datos masivos. El proyecto inicialmete introdujo el RDD, Resilient Distributed Datasets, una API para computación tolerante a fallos en un entorno de cluster.
+
+Más recientemte muchas más APIs de alto nivel están siendo desarrolladas en Spark. Estás son las siguientes:
+
+- Machine Learning Library (MLLib) una biblioteca para machine learning a gran escala.
+- GraphX, una biblioteca para procesamiento de grafos a gran escala
+- SparkSQL, una API para consultas analíticas en SQL
+
+Las bibliotecas están integradas en el CORE de Spark, por lo que Spark, puede permitir flujos de trabajos complejos, donde consultas SQL pueden ser usadas para preprocesar posteriormente los datos y analizarlos de forma avanzada con la parte de Machine Learning
+
+#### ¿Por qué Spark? ¿Qué ventajas tiene?
+
+Desde el inicio de Hadoop hace más de 10 años, poco a poco han aparecido nuevos problemas que ya no se podían resolver usando el paradigma de MapReduce. Esto ha echo que hayan aparecido nuevos sistemas para afrontar estos problemas, apareciendo :
+
+![alt text](https://camo.githubusercontent.com/0edf6ca76b4be5bc81bc3c7ba05b633ce9abe07a/68747470733a2f2f73697465732e676f6f676c652e636f6d2f736974652f6d616e7570617272612f686f6d652f666c6f72612e706e67)
+
+Una característica importante es que muchas de las aplicaciones ya existentes se han hecho compatibles con Spark y que estén surgiendo nuevas enfocadas en trabajar con Spark en áreas especificas de procesamiento de datos masivos.
+
+![alt text](https://camo.githubusercontent.com/ed13af052590448deb8f371fd38eed392bd34bed/68747470733a2f2f73697465732e676f6f676c652e636f6d2f736974652f6d616e7570617272612f686f6d652f6661756e612e706e67)
+
+
+#### SparkR
+
+SparkR está construido como un paquete en R, luego no es necesarios hacer cosas especiales para que funcione.
+
+El componente principal de SparkR es un DDF, Distributed Data Frame, que permite procesamiento de datos estructurados utilizando la sintaxis familiar para los usuarios acostumbrados a R.
+
+Para mejorar el rendimiento, sobre grandes conjuntos de datos, SparkR provee de "evaluación perezosa" para operaciones sobre dataframes y utiliza además un optimizador de consultas relacionales para optimiar la ejecución.
+
+![alt text](https://camo.githubusercontent.com/0efc69b82a0a47197e9390910e55c4f41247812c/68747470733a2f2f73697465732e676f6f676c652e636f6d2f736974652f6d616e7570617272612f686f6d652f72737061726b5f617263682e706e67)
+
+
 
 ### Inicio del entorno de trabajo
 
