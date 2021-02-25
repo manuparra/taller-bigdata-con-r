@@ -286,5 +286,325 @@ write.df(finals, path = "resultsfinals.parquet", source = "parquet", mode = "ove
 write.df(finals, path = "resultsfinals.csv", source = "csv", mode = "overwrite")
 ```
 
+### Operaciones con SparkDataFrames
 
+Cargamos un conjunto de datos **masivo** desde el repositirio de datasets.
+
+El dataset que vamos a usar para el procesamiento de dato masivos, corresponde con un conjunto de datos de los registros de viaje en TAXI, donde se capturan las fechas y horas de recogida y devolución de pasajeros, lugares de recogida y entrega (coordenadas), distancias de viaje, tarifas detalladas, tipos de tarifas, tipos de pago y conteos de pasajeros que van en el taxi.
+
+El dataset tiene MUCHAS posibilidades de procesamiento y también extracción de conocimiento.
+
+Estos conjuntos de datos adjuntos fueron recopilados y proporcionados por la Comisión de Taxisde Nueva York (TLC) http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml
+
+Características del conjunto de datos original:
+
+- El conjunto de datos NYCTaxiTrips en total tiene sobre 267GB, que pueden ser manejados sin problema por SparkR (en un cluster real, no sobre una máquina virtual sencilla).
+- En total contiene 1100 millones de registros.
+- Más información de como se gestionan 1100 millones de instancias en la siguiente web y se soluciona este problema problema real: http://toddwschneider.com/posts/analyzing-1-1-billion-nyc-taxi-and-uber-trips-with-a-vengeance/
+
+Más datasets masivos de NYCTaxiTrips en: http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml
+
+Primero revisamos los distintos dataset que se han preparado en: 
+- yellow_tripdata_2016-01.csv
+- yellow_tripdata_2016-02_small1.csv
+- yellow_tripdata_2016-02_small2.csv
+- yellow_tripdata_2016-02_small3.csv
+
+```
+# Cargamos una versión reducida de los datos en CSV
+df_nyctrips <- read.df("/root/TallerSparkR/datasets/yellow_tripdata_2016-02_small3.csv", "csv", header = "true", inferSchema = "true")
+```
+
+Estudiamos de manera superficial el dataset
+
+```
+# Comprobamos los campos del dataset
+printSchema(df_nyctrips)
+
+# Comprobamos como son los datos:
+head(df_nyctrips)
+
+# Contamos el total del registros:
+count(df_nyctrips)
+```
+
+
+#### Selección de instancias y columnas
+
+Para la selección de columnas y filas, usamos select y filter.
+
+Todas las operaciones se pueden combinar para producir un nuevo dataset o SparkDataFrame. Son equivalentes a usar SPARKSQL .
+
+Estas operaciones son esenciales si queremos transformar el dataset en otra versión preprocesada del mismo.
+
+```
+# Seleccionamos sólo la columna longitud, por el id de la columna
+# Por ID de columna 
+head(select(df_nyctrips,df_nyctrips$pickup_longitude))
+```
+
+```
+# Seleccionamos sólo la columna longitud, por el nombre de la columna.
+# Por nombre de columna del dataset
+head(select(df_nyctrips,"pickup_longitude"))
+```
+
+
+
+Para aplicar filtros de para las filas usamos filter que admite expresiones con operadores condicionales:
+
+```< = > ! & | ...```
+
+```
+# Aplicamos un filtro para ver los viajes aquellos viajes de taxi de más de 10 millas.
+head(filter(df_nyctrips, df_nyctrips$trip_distance > 10 & df_nyctrips$total_amount> 20 ))
+```
+```
+# Aplicamos un filtro para ver los viajes aquellos viajes de taxi de más de 10 millas y el importe mayor de $ 20
+head(filter(df_nyctrips, df_nyctrips$trip_distance > 10 & df_nyctrips$total_amount> 20 ))
+```
+```
+# Aplicamos un filtro para ver el viaje más caro en Taxi que se ha hecho:
+head( agg(df_nyctrips ,max = max(df_nyctrips$total_amount)))
+```
+```
+# Aplicamos un filtro para ver el viaje menos caro en Taxi que se ha hecho:
+head(agg(df_nyctrips, min = min(df_nyctrips$total_amount)))
+```
+
+#### Uso de agrupación y agregación
+
+Los SparkDataFrames soportan funciones de agregado despues de agrupar.
+
+Por ejemplo podemos:
+
+```
+# Agrupamos por Vendedor y mostramos el número de viajes.
+head(summarize(groupBy(df_nyctrips, df_nyctrips$VendorID), count = n(df_nyctrips$VendorID)))
+```
+```
+# Agrupamos por Vendedor y mostramos el número de viajes.
+head(summarize(groupBy(df_nyctrips, df_nyctrips$VendorID), max = max(df_nyctrips$total_amount)))
+```
+
+```
+# Agrupamos y ordenamos
+numsum <- summarize(groupBy(df_nyctrips, df_nyctrips$VendorID), num = n(df_nyctrips$VendorID))
+head(arrange(numsum,asc(numsum$num)))
+```
+
+```
+# Agrupamos por numero de pasajeros y mostramos el numero de viajes
+trips_passenger <- summarize(groupBy(df_nyctrips, df_nyctrips$passenger_count), count = n(df_nyctrips$passenger_count))
+```
+
+```
+# Cuidado con el COLLECT !
+trips_df <- head(collect(trips_passenger))
+```
+
+```
+head(trips_df)
+```
+
+#### Operaciones con columnas
+
+Otras operaciones muy familiares en R, corresponden con la manipulación o transformación de valores en los registros de un dataset. En este caso la manipulación es muy sencilla:
+
+```
+# Convertimos la columna de millas a kilómetros, igual que en R.
+df_nyctrips$trip_distance <- df_nyctrips$trip_distance*1.6
+```
+
+```
+head(df_nyctrips)
+```
+
+#### Añadir columnas
+
+```
+# Usamos mutate para añadir columnas que operan con elementos de las demás columnas.
+
+# mutate(sql_nyc,  uniform = rand(10),  normal  = randn(27))
+
+head(mutate(df_nyctrips,  uniform = rand(10),  normal  = randn(27)))
+head(mutate(df_nyctrips,  uniform =df_nyctrips$total_amount*1.1355,  normal  = randn(27)))
+```
+
+```
+# Otro modo de hacerlo es:
+head(withColumn(df_nyctrips,"uniform",rand(20)))
+```
+
+#### Operando con SparkSQL sobre conjuntos masivos de datos
+
+
+
+Todas las funciones de manejo de datos que se han usado con SparkR, pueden hacerse de una forma sencilla e intuitiva con SparkSQL
+
+```
+# sql_nyc es nuestro DataFrameSpark de SQL
+createOrReplaceTempView(sql_nyc,"slqdf_filtered_nyc")
+
+# Hacemos una consulta para extraer el viaje de mayor distancia de cada venderor.
+results <- sql("select VendorID, MAX(trip_distance) from slqdf_filtered_nyc GROUP BY VendorID ")
+```
+
+
+```
+# Vemos el resultado.
+head(results)
+```
+
+
+
+
+Buscamos el total de kilómetros recorridos por cada vendedor:
+```
+results <- sql("select VendorID, SUM(trip_distance) from slqdf_filtered_nyc GROUP BY VendorID ")
+
+# Vemos el resultado
+head(results)
+```
+
+
+
+Calculamos el tiempo en segundos
+```
+results <- sql("select VendorID, SUM(trip_time) from slqdf_filtered_nyc GROUP BY VendorID ")
+
+# Vemos los resultados
+head(results)
+```
+
+
+
+Calculamos el tiempo en minutos
+```
+results <- sql("select VendorID, SUM(trip_time)/60.0 as min_trip from slqdf_filtered_nyc GROUP BY VendorID ")
+
+# Vemos los resultados
+head(results)
+```
+
+
+
+Buscamos la ganacia total cada vendedor:
+
+```
+results <- sql("select VendorID, SUM(total_amount)*1.10373 as Total_Amount_Euro from slqdf_filtered_nyc GROUP BY VendorID ")
+
+# Vemos el resultado
+head(results)
+```
+
+
+
+Calculamos la media y la desviación típica del tiempo de recorrido y ganancia por numero de personas:
+
+```
+results <- sql("select passenger_count, AVG(trip_time), AVG(total_amount) ,AVG(trip_distance)   
+                from slqdf_filtered_nyc 
+                GROUP BY passenger_count 
+                order by passenger_count ASC ")
+head(results)
+```
+
+
+
+Coeficiente de correlación
+
+
+```
+results <- sql("select corr(total_amount,trip_distance) as correlation_coef
+                from 
+                slqdf_filtered_nyc")
+# Ver resultados
+head(results)
+```
+
+
+```
+results <- sql("select corr(total_amount,trip_time) as correlation_coef
+                from 
+                slqdf_filtered_nyc")
+head(results
+```
+
+```
+results <- sql("select corr(trip_time,trip_distance) as correlation_coef
+                from 
+                slqdf_filtered_nyc")
+head(results)
+```
+
+
+### Uso de pipes con magittr
+
+
+
+El paquete magrittr permite:
+
+- mejorar el tiempo de desarrollo y
+- mejorar enormemente la legibilidad y mantenibilidad del código.
+
+Para usarlo hay que importar la biblioteca magrittr dentro del proyecto y apartir de ese momentos podemos utilizar el operador
+
+```%>%``` para concaternar operaciones y poder trabajar con flujos de datos y pipelines.
+
+Provee de un operador que sirve para hacer pipes con el cual se puede encauzar un valor hacia adelante dentro de una expresión o llamada a función.
+
+Veamos todas las operaciones que hemos realizado sobre los datos y su equivalente con pipes.
+
+```
+# Hacemos una copia del SparkDataFrame para usarla en una vista temporal en SQL
+createOrReplaceTempView(df_nyctrips,"slqdf_filtered_nyc")
+
+# Hacemos una selección de los registros, donde calculamos el tiempo del viaje de cada viaje
+sql_nyc <- sql("select VendorID,INT(unix_timestamp(tpep_dropoff_datetime)- unix_timestamp(tpep_pickup_datetime)) AS trip_time,passenger_count,trip_distance,total_amount from slqdf_filtered_nyc")
+
+head(sql_nyc)
+```
+
+```
+# Usamos magrittr
+library(magrittr)
+
+# results <- sql("select VendorID, MAX(trip_distance) from slqdf_filtered_nyc GROUP BY VendorID ")
+#summarize(groupBy(df_nyctrips, df_nyctrips$passenger_count), count = n(df_nyctrips$passenger_count))
+
+df_nyctrips %>% 
+        groupBy( df_nyctrips$passenger_count) %>%
+        summarize(count = n(df_nyctrips$passenger_count)) %>%
+        head()
+```
+
+```
+df_nyctrips %>% 
+        groupBy( df_nyctrips$passenger_count) %>%
+        summarize( avg_total_amount=avg(df_nyctrips$total_amount) ,avg_trip_distance=avg(df_nyctrips$trip_distance)) %>%
+        head()
+```
+
+```
+df_nyctrips %>% 
+         groupBy( df_nyctrips$passenger_count) %>%
+        summarize(min = min(df_nyctrips$trip_distance),max = max(df_nyctrips$trip_distance)) %>%
+        head()
+```
+
+```
+df_nyctrips %>% 
+         groupBy( df_nyctrips$passenger_count, hour(df_nyctrips$tpep_pickup_datetime)) %>%
+        summarize(total_pickup = n(df_nyctrips$tpep_pickup_datetime)) %>%
+        head()
+```
+
+```
+count(sql_nyc)
+num_regs <- as.integer(count(sql_nyc))
+
+# Mostramos el número de registros
+print(num_regs)
+```
 
