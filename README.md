@@ -608,3 +608,145 @@ num_regs <- as.integer(count(sql_nyc))
 print(num_regs)
 ```
 
+### Minería de datos 
+
+La biblioteca de SparkR actualmente soporta los siguientes algoritmos de aprendizaje automático :
+- modelo lineal generalizado,
+- modelo de regresión de supervivencia con tiempo de fallo acelerado (AFT),
+- modelo Bayes Naive y
+- modelo KMeans.
+
+SparkR utiliza MLlib para entrenar el modelo. Por tanto se puede analizar el resumen del modelo ajustado, predecir y hacer predicciones sobre nuevos datos y escribir/leer el modelo para guardar / cargar los modelos ajustados.
+
+Además de ello, al igual que ocurre cuando usamos cualquier funcion en R, SparkR soporta el uso de fómulas, lo cual mejora bastante la adopción de SparkR para análisis de datos másivos. SparkR soporta un subconjunto de los operadores de fórmula R disponibles para el ajuste del modelo, incluyendo '~', '.', ':', '+' y '-'.
+
+Dado que parte de SparkR está modelado en el paquete dplyr, ciertas funciones de SparkR comparten los mismos nombres con los de dplyr. Dependiendo del orden de carga de los dos paquetes, algunas funciones del paquete cargado primero son enmascaradas por las del paquete cargado después.
+
+```
+cov in package:stats
+filter in package:stats
+sample in package:base
+```
+
+Por tanto hay siempre que usar el paquete que queramos usar al final de la importación de las bibliotecas para que se haga efectiva la función que queremos para SparkR.
+
+#### Algoritmos
+
+El paquete SparkR soporta las siguientes funcionalidades de Machine Learning y Data mining
+
+
+#### Generalized Linear Model
+
+Usamos la función de R
+
+```
+gaussianDF <- iris
+gaussianTestDF <- iris
+gaussianGLM <- glm(data = gaussianDF, Sepal.Length ~ Sepal.Width + Species, family = "gaussian")
+
+summary(gaussianGLM)
+```
+
+
+
+Usamos la función para glm de SparkR
+
+
+```
+irisDF <- suppressWarnings(createDataFrame(iris))
+# Fit a generalized linear model of family "gaussian" with spark.glm
+gaussianDF <- irisDF
+gaussianTestDF <- irisDF
+gaussianGLM <- spark.glm(gaussianDF, Sepal_Length ~ Sepal_Width + Species, family = "gaussian")
+
+# Model summary
+summary(gaussianGLM)
+```
+
+**¿Qué diferencias hay entre ambos?**
+
+Calculamos el modelo
+
+```
+# Calculamos la predicción
+gaussianPredictions <- predict(gaussianGLM, gaussianTestDF)
+# Mostramos las predicciones
+showDF(gaussianPredictions)
+
+# Usamos la función de R de glm con la familia gaussian
+gaussianGLM2 <- glm(Sepal_Length ~ Sepal_Width + Species, gaussianDF, family = "gaussian")
+summary(gaussianGLM2)
+
+# Ahora usamos la función de glm de spark para la familia binomial.
+binomialDF <- filter(irisDF, irisDF$Species != "setosa")
+binomialTestDF <- binomialDF
+binomialGLM <- spark.glm(binomialDF, Species ~ Sepal_Length + Sepal_Width, family = "binomial")
+
+# Imprimimos el modelo
+summary(binomialGLM)
+
+# Obtenemos la predicción
+binomialPredictions <- predict(binomialGLM, binomialTestDF)
+showDF(binomialPredictions)
+```
+
+##### K-MEANS
+
+
+```
+library(ggplot2)
+ggplot(iris, aes(Petal.Length, Petal.Width, color = Species)) + geom_point()
+
+set.seed(20)
+irisCluster <- kmeans(iris[, 3:4], 3, nstart = 20)
+irisCluster
+```
+
+```
+# Ajustamos un modelo k-medias. 
+
+irisDF <- suppressWarnings(createDataFrame(iris))
+kmeansDF <- irisDF
+kmeansTestDF <- irisDF
+kmeansModel <- spark.kmeans(kmeansDF, ~ Sepal_Length + Sepal_Width + Petal_Length + Petal_Width,
+                            k = 3)
+
+# Vemos el resumen
+summary(kmeansModel)
+
+# Vemos los resultados del ajuste
+showDF(fitted(kmeansModel))
+
+# y vemos la predicción
+kmeansPredictions <- predict(kmeansModel, kmeansTestDF)
+showDF(kmeansPredictions)
+
+# Mostramos la información de los grupos.
+table(kmeansModel$cluster, iris$Species)
+```
+
+
+#### Creación de Conjuntos de entrenamiento y prueba
+
+Existen varias formas de hacer los conjuntos de prueba y test. Se pueden usar las funciones de muestreo (sample) que trabajan sobre los SparkDataFrames.
+
+```
+train_df <- sample(df_training, withReplacement=FALSE, fraction=0.85, seed=42)
+test_df <- except(df_training, train_df)
+
+count(train_df)
+count(test_df)
+```
+
+#### Persistencia de los MODELOS generados
+
+Si necesitamos almacenar el modelo que hemos ajustado podemo hacerlo mediante el uso de la funcion write.ml. Al igual que luego podemos recuperarlo con read.ml.
+
+```
+modelPath <- tempfile(pattern = "ml", fileext = ".tmp")
+write.ml(gaussianGLM, modelPath)
+gaussianGLM2 <- read.ml(modelPat
+```
+
+
+
