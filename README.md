@@ -1,5 +1,12 @@
 # Taller Big Data con Apache Spark + R desde Databricks cloud
 
+Procesamiento de datos Big Data con Spark + R sobre DataBricks
+
+Seminarios de Especialización “Empresa Digital” - Análisis de datos para la toma de decisiones
+Universidad de Castilla-LaMancha - España
+
+Taller impartido por: Manuel Jesús Parra Royón
+
 ### R + Spark + Big Data
 
 ![alt text](https://camo.githubusercontent.com/c5bfd73908238855af39f3c8536dfcc6169db4c6/68747470733a2f2f73697465732e676f6f676c652e636f6d2f736974652f6d616e7570617272612f686f6d652f537061726b526c6f676f2e706e67)
