@@ -184,7 +184,7 @@ Para la lectura de datos con SparkR usamos la función read.df( )
 
 ```
 # Sólo indicamos un fichero concreto .... No hay problema Spark es muy listo ! ;)
-df <- read.df("/root/TallerSparkR/datasets/csv/buy_costumers_amazon01.csv", "csv", header = "true", inferSchema = "true")
+df <- read.df("dbfs:/FileStore/shared_uploads/TU_USUARIO/buy_costumers_amazon01.csv", "csv", header = "true", inferSchema = "true")
 printSchema(df)
 count(df)
 head(df)
@@ -192,7 +192,7 @@ head(df)
 
 ```
 # Sólo indicamos un fichero concreto .... No hay problema Spark es muy listo ! ;)
-df <- read.df("/root/TallerSparkR/datasets/csv/buy_costumers_amazon01.csv", "csv", header = "true", inferSchema = "true")
+df <- read.df("dbfs:/FileStore/shared_uploads/TU_USUARIO/buy_costumers_amazon01.csv", "csv", header = "true", inferSchema = "true")
 print("Estructura sin parsear:")
 printSchema(df)
 
@@ -204,7 +204,7 @@ schema_amazon <- structType(structField("id", "integer"),
                      structField("amount", "double"),
                      structField("credit_card", "string"))
 
-df <- read.df("/root/TallerSparkR/datasets/csv/buy_costumers_amazon01.csv", "csv", header = "true", schema=schema_amazon)
+df <- read.df("dbfs:/FileStore/shared_uploads/TU_USUARIO/buy_costumers_amazon01.csv", "csv", header = "true", schema=schema_amazon)
 print("Estructura parseada:")
 printSchema(df)
 head(df)
@@ -217,7 +217,7 @@ Si queremos leer todos los ficheros de un directorio sin entrar en los subdirect
 
 ```
 # Esto leería todos los ficheros de la carpeta pero no entraría a cada subdirectorio... Spark no eres muy listo !
-df <- read.df("/ruta_de_los_datos/", "csv", header = "true", inferSchema = "true", schema=schema_amazon)
+df <- read.df("dbfs:/FileStore/shared_uploads/TU_USUARIO/directorio/", "csv", header = "true", inferSchema = "true", schema=schema_amazon)
 count(df)
 ```
 
@@ -231,10 +231,10 @@ Esto da mucha versatilidad, ya que independiente del tipo de fuente, podemos alm
 
 ```
 # Escritura desde CSV a CSV:
-write.df(df_full, path = "resultado_df_full.csv", source = "csv", mode = "overwrite")
+write.df(df, path = "resultado_df_full.csv", source = "csv", mode = "overwrite")
 
 # Escritura desde CSV a PARQUET
-write.df(df_full, path = "resultado_df_full.parquet", source = "parquet", mode = "overwrite")
+write.df(df, path = "resultado_df_full.parquet", source = "parquet", mode = "overwrite")
 ```
 En mode podemos usar 'append', 'overwrite', 'error', 'ignore'.
 
@@ -251,7 +251,7 @@ La estructura del fichero se segmenta en N columnas partidas en M grupos de fila
 
 ```
 # Leemos un dataset que contiene los datos en formato Parquet
-df_parquet <- read.df("/root/TallerSparkR/datasets/parquet/", "parquet")
+df_parquet <- read.df("dbfs:/FileStore/shared_uploads/TU_USUARIO/parquet/", "parquet")
 ```
 
 
@@ -382,14 +382,12 @@ Características del conjunto de datos original:
 Más datasets masivos de NYCTaxiTrips en: http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml
 
 Primero revisamos los distintos dataset que se han preparado en: 
-- yellow_tripdata_2016-01.csv
-- yellow_tripdata_2016-02_small1.csv
 - yellow_tripdata_2016-02_small2.csv
 - yellow_tripdata_2016-02_small3.csv
 
 ```
 # Cargamos una versión reducida de los datos en CSV
-df_nyctrips <- read.df("/root/TallerSparkR/datasets/yellow_tripdata_2016-02_small3.csv", "csv", header = "true", inferSchema = "true")
+df_nyctrips <- read.df("dbfs:/FileStore/shared_uploads/manuparr.a@gmail.com/yellow_tripdata_2016-02_small3.csv", "csv", header = "true", inferSchema = "true")
 ```
 
 Estudiamos de manera superficial el dataset
