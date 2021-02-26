@@ -7,6 +7,40 @@ Universidad de Castilla-LaMancha - España
 
 Taller impartido por: Manuel Jesús Parra Royón
 
+
+**Contenido:**
+
+- [Taller Big Data con Apache Spark + R desde Databricks cloud](#taller-big-data-con-apache-spark---r-desde-databricks-cloud)
+    + [R + Spark + Big Data](#r---spark---big-data)
+      - [Introducción](#introducci-n)
+      - [R](#r)
+      - [Entonces, ¿cuál es el problema? ¿Por qué no se usa para Datos Masivos?](#entonces---cu-l-es-el-problema---por-qu--no-se-usa-para-datos-masivos-)
+      - [Spark](#spark)
+      - [¿Por qué Spark? ¿Qué ventajas tiene?](#-por-qu--spark---qu--ventajas-tiene-)
+      - [SparkR](#sparkr)
+    + [Inicio del entorno de trabajo](#inicio-del-entorno-de-trabajo)
+    + [Inicio de la sesión con Spark y R](#inicio-de-la-sesi-n-con-spark-y-r)
+    + [Primera prueba de con datos simples](#primera-prueba-de-con-datos-simples)
+    + [Operaciones sencillas con SparkR sobre SparkDataFrames](#operaciones-sencillas-con-sparkr-sobre-sparkdataframes)
+    + [Fuentes de datos para Big Data](#fuentes-de-datos-para-big-data)
+    + [Trabajo con ficheros en formato CSV](#trabajo-con-ficheros-en-formato-csv)
+    + [Escritura de datos o resultados](#escritura-de-datos-o-resultados)
+    + [Trabajo con datos en formato PARQUE -> Igual que CSV u otros ficheros](#trabajo-con-datos-en-formato-parque----igual-que-csv-u-otros-ficheros)
+      - [Ejercicio básico](#ejercicio-b-sico)
+    + [Operaciones con SparkDataFrames](#operaciones-con-sparkdataframes)
+      - [Selección de instancias y columnas](#selecci-n-de-instancias-y-columnas)
+      - [Uso de agrupación y agregación](#uso-de-agrupaci-n-y-agregaci-n)
+      - [Operaciones con columnas](#operaciones-con-columnas)
+      - [Añadir columnas](#a-adir-columnas)
+      - [Operando con SparkSQL sobre conjuntos masivos de datos](#operando-con-sparksql-sobre-conjuntos-masivos-de-datos)
+    + [Uso de pipes con magittr](#uso-de-pipes-con-magittr)
+    + [Minería de datos](#miner-a-de-datos)
+      - [Algoritmos](#algoritmos)
+      - [Generalized Linear Model](#generalized-linear-model)
+        * [K-MEANS](#k-means)
+      - [Creación de Conjuntos de entrenamiento y prueba](#creaci-n-de-conjuntos-de-entrenamiento-y-prueba)
+      - [Persistencia de los MODELOS generados](#persistencia-de-los-modelos-generados)
+
 ### R + Spark + Big Data
 
 ![alt text](https://camo.githubusercontent.com/c5bfd73908238855af39f3c8536dfcc6169db4c6/68747470733a2f2f73697465732e676f6f676c652e636f6d2f736974652f6d616e7570617272612f686f6d652f537061726b526c6f676f2e706e67)
